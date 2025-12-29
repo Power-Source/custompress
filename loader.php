@@ -1,7 +1,7 @@
 <?php
 /*
 Plugin Name: CustomPress
-Plugin URI: https://cp-psource.github.io/custompress/
+Plugin URI: https://power-source.github.io/custompress/
 Description: CustomPress - Benutzerdefinierter Post-, Taxonomie- und Feldmanager.
 Version: 1.0.0
 Author: PSOURCE
