@@ -9,9 +9,7 @@ $post_types = get_site_option('ct_custom_post_types');
 else
 $post_types = $this->post_types;
 
-wp_enqueue_style('jquery-ui-datepicker');
-wp_enqueue_script('jquery-ui-datepicker');
-wp_enqueue_script('jquery-ui-datepicker-lang');
+
 
 if ( $enable_subsite_content_types && $display_network_content_types )
 $network_post_types = get_site_option('ct_custom_post_types');
@@ -311,12 +309,15 @@ $cp_post_type = empty($options['display_post_types']) ?
 	</form>
 </div>
 
+<link rel="stylesheet" href="<?php echo $this->plugin_url; ?>assets/flatpickr/flatpickr.min.css">
+<script src="<?php echo $this->plugin_url; ?>assets/flatpickr/flatpickr.min.js"></script>
 <script type="text/javascript">
-    jQuery(document).ready(function ($) {
-        //Make em pickers
-        $('.pickdate').datepicker({ dateFormat: '<?php echo esc_js($date_format); ?>' });
-        //Default date for display
-        $('#datepicker').val($.datepicker.formatDate('<?php echo esc_js( $date_format ); ?>', new Date()));
-    });
+document.addEventListener('DOMContentLoaded', function() {
+	flatpickr('.pickdate', {
+		dateFormat: '<?php echo esc_js($date_format); ?>',
+		defaultDate: new Date(),
+		allowInput: true
+	});
+});
 </script>
 

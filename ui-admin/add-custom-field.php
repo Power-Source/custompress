@@ -109,11 +109,11 @@ $post_types = get_post_types('','names');
 								?>
 								<h4><?php esc_html_e('Fülle die Optionen für dieses Feld aus', $this->text_domain); ?>:</h4>
 								<p>
-									<input type="text" id="field_date_format" name="field_date_format" size="38" value="<?php esc_attr( $date_format ); ?>" onchange="jQuery('#datepicker').datepicker( 'option', 'dateFormat', this.value );"/>
+									<input type="text" id="field_date_format" name="field_date_format" size="38" value="<?php esc_attr( $date_format ); ?>" onchange="if(window.flatpickrInstance){flatpickrInstance.set('dateFormat', this.value);}"/>
 									<br /><span class="description"><?php esc_html_e('Wähle die Option Datumsformat oder gib Deine eigene ein', $this->text_domain) ?></span>
 									<br />
 									<br />
-									<input class="pickdate" id="datepicker" type="text" size="38" value="" /><br />
+									<input class="pickdate" id="datepicker" type="text" size="38" value="" autocomplete="off" /><br />
 									<span class="description"><?php esc_html_e('Datumsauswahl Beispiel', $this->text_domain) ?></span>
 								</p>
 
@@ -235,9 +235,14 @@ $post_types = get_post_types('','names');
 	</form>
 </div>
 
+<link rel="stylesheet" href="<?php echo $this->plugin_url; ?>assets/flatpickr/flatpickr.min.css">
+<script src="<?php echo $this->plugin_url; ?>assets/flatpickr/flatpickr.min.js"></script>
 <script type="text/javascript">
-	jQuery(document).ready(function(){
-		jQuery('#datepicker').datepicker({ dateFormat : '<?php echo esc_js( $date_format); ?>' });
-		jQuery('#datepicker').attr('value', jQuery.datepicker.formatDate('<?php echo esc_js( $date_format ); ?>', new Date(), {}) );
+document.addEventListener('DOMContentLoaded', function() {
+	window.flatpickrInstance = flatpickr('#datepicker', {
+		dateFormat: '<?php echo esc_js( $date_format ); ?>',
+		defaultDate: new Date(),
+		allowInput: true
 	});
+});
 </script>

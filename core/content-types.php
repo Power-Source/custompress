@@ -675,10 +675,8 @@ if ( ! class_exists( 'CustomPress_Content_Types' ) ):
 							break;
 						}
 						case 'datepicker': {
-							wp_enqueue_style( 'jquery-ui-datepicker' );
-							wp_enqueue_script( 'jquery-ui-datepicker' );
-							wp_enqueue_script( 'jquery-ui-datepicker-lang' );
-							//						$result = $this->jquery_ui_css() . PHP_EOL;
+							// Flatpickr-Styles werden global eingebunden, daher kein Enqueue mehr nötig.
+
 							$result = '';
 
 							if ( ! empty( $custom_field['field_return_format'] ) ) {
@@ -692,19 +690,28 @@ if ( ! class_exists( 'CustomPress_Content_Types' ) ):
 								$value = esc_attr( strip_tags( get_post_meta( $post->ID, $id, true ) ) );
 							}
 
-							$result .= sprintf( '<input type="text" class="pickdate ct-field %s" name="%s" id="%s" value="%s" />', $class, $id, $id, $value ) . PHP_EOL;
-							$result .= sprintf( '
-								<script type="text/javascript">
-								jQuery(document).ready(function(){
-								jQuery("#%s").datepicker({ dateFormat : "%s", "onSelect": function( dateText, obj ){
-									var _hiden_db_field = jQuery("#%s-db");
-									if( _hiden_db_field.length ){
-										_hiden_db_field.val( obj.selectedYear + ( "0"+ (obj.selectedMonth + 1)).slice(-2) + ("0" + obj.selectedDay).slice(-2) );
-									}
-								} });
-								});
-								</script>
-							', $id, $custom_field['field_date_format'], $id );
+							$result .= sprintf( '<input type="text" class="pickdate ct-field %s" name="%s" id="%s" value="%s" autocomplete="off" />', $class, $id, $id, $value ) . PHP_EOL;
+							$result .= sprintf('
+							<script type="text/javascript">
+							document.addEventListener("DOMContentLoaded", function() {
+							flatpickr("#%s", {
+								dateFormat: "%s",
+								defaultDate: "%s",
+								allowInput: true,
+								onChange: function(selectedDates, dateStr, instance) {
+								var dbField = document.getElementById("%s-db");
+								if(dbField && selectedDates.length) {
+									var d = selectedDates[0];
+									var y = d.getFullYear();
+									var m = ("0" + (d.getMonth() + 1)).slice(-2);
+									var day = ("0" + d.getDate()).slice(-2);
+									dbField.value = "" + y + m + day;
+								}
+								}
+							});
+							});
+							</script>
+							', $id, $custom_field['field_date_format'], $value, $id);
 							break;
 						}
 						case 'upload':
