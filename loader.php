@@ -1,9 +1,9 @@
 <?php
 /*
 Plugin Name: CustomPress
-Plugin URI: https://power-source.github.io/custompress/
+Plugin URI: https://psource.eimen.net/psource/custompress/
 Description: CustomPress - Benutzerdefinierter Post-, Taxonomie- und Feldmanager.
-Version: 1.0.0
+Version: 1.0.1
 Author: PSOURCE
 Author URI: https://github.com/Power-Source
 Text Domain: custompress
@@ -68,7 +68,7 @@ add_action( 'admin_notices', function() {
 });
 
 /* Define plugin version */
-if( !defined('CPT_VERSION') ) define ( 'CPT_VERSION', '1.0.0' );
+if( !defined('CPT_VERSION') ) define ( 'CPT_VERSION', '1.0.1' );
 /* define the plugin folder url */
 if( !defined('CPT_PLUGIN_URL') ) define ( 'CPT_PLUGIN_URL', plugin_dir_url(__FILE__) );
 /* define the plugin folder dir */
@@ -85,5 +85,4 @@ include_once 'core/content-types.php';
 include_once 'core/functions.php';
 
 if ( is_admin() ) include_once 'core/admin.php';
-
 

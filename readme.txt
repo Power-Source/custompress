@@ -2,9 +2,10 @@
 Contributors: PSOURCE
 Tags: widget, custom,post, wordpress, classicpress
 Requires at least: 4.9
-Tested up to: 6.8.1
-Stable tag: 1.0.0
-Requires PHP: 7.0
+Requires CP: 2.7
+Requires PHP: 8.0
+Tested up to: 7.2.4
+Stable tag: 1.0.1
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -184,6 +185,13 @@ Wenn Du ein besseres Verständnis für Folgendes erlangen möchtest:
 
 == ChangeLog ==
 
+= 1.0.1 =
+
+* Behebt die Seitennavigation in Kategorie-, Schlagwort- und Taxonomiearchiven mit benutzerdefinierten Beitragstypen.
+* Zeigt in Taxonomiearchiven automatisch alle passenden öffentlichen Beitragstypen an, ohne eigene Archive anderer Plugins zu verändern.
+* Ersetzt den veralteten jQuery-UI-Datepicker durch Flatpickr und vereinheitlicht die Datumsauswahl im Backend.
+* Fügt eine deutsch- und englischsprachige Projektdokumentation hinzu.
+
 = 1.0.0 =
 
-* Release 
+* Release

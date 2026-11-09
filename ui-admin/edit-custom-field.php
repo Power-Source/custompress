@@ -112,12 +112,10 @@ $custom_field = $this->custom_fields[$_GET['ct_edit_custom_field']];
 								$date_format = (isset( $custom_field['field_date_format'])) ? $custom_field['field_date_format'] : $this->get_options('date_format');
 								$date_format = (is_array($date_format)) ? 'mm/dd/yy' : $date_format;
 
-//								$this->jquery_ui_css(); //Load the current ui theme css
-
 								?>
 								<h4><?php esc_html_e('Fülle die Optionen für dieses Feld aus', $this->text_domain); ?>:</h4>
 								<p>
-									<input type="text" id="field_date_format" name="field_date_format" size="38" value="<?php echo esc_attr( $date_format ); ?>" onchange="if(window.flatpickrInstance){flatpickrInstance.set('dateFormat', this.value);}"/>
+									<input type="text" id="field_date_format" name="field_date_format" size="38" value="<?php echo esc_attr( $date_format ); ?>" onchange="if(window.flatpickrInstance){flatpickrInstance.set('dateFormat', ctDateFormatToFlatpickr(this.value));}"/>
 									<br /><span class="description"><?php esc_html_e('Wähle die Option Datumsformat oder gib Deine eigene ein', $this->text_domain) ?></span>
 									<br /><br />
 									<input class="pickdate" id="datepicker" type="text" size="38" value="" autocomplete="off" /><br />
@@ -241,14 +239,10 @@ $custom_field = $this->custom_fields[$_GET['ct_edit_custom_field']];
 
 </div>
 
-<link rel="stylesheet" href="<?php echo $this->plugin_url; ?>assets/flatpickr/flatpickr.min.css">
-<script src="<?php echo $this->plugin_url; ?>assets/flatpickr/flatpickr.min.js"></script>
 <script type="text/javascript">
 document.addEventListener('DOMContentLoaded', function() {
-	window.flatpickrInstance = flatpickr('#datepicker', {
-		dateFormat: '<?php echo esc_js( $date_format ); ?>',
-		defaultDate: new Date(),
-		allowInput: true
+	window.flatpickrInstance = ctCreateDatePicker('#datepicker', '<?php echo esc_js( $date_format ); ?>', {
+		defaultDate: new Date()
 	});
 });
 </script>

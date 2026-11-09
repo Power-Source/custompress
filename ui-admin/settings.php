@@ -151,7 +151,7 @@ $cp_post_type = empty($options['display_post_types']) ?
 		<table class="form-table">
 			<tr>
 				<th>
-					<label><?php esc_html_e('Zeige in "Archiven" die folgenden Beitragstypen an:  ', $this->text_domain) ?></label>
+					<label><?php esc_html_e('Zeige in Datums- und Autorenarchiven die folgenden Beitragstypen an: ', $this->text_domain) ?></label>
 				</th>
 				<td>
 					<input type="checkbox" name="cp_post_type[archive][]" value="post" <?php checked(is_array($cp_post_type['archive']['post_type']) && in_array('post',$cp_post_type['archive']['post_type'])); ?> />
@@ -180,7 +180,7 @@ $cp_post_type = empty($options['display_post_types']) ?
 					<?php endif; ?>
 					<?php endif; ?>
 
-					<span class="description"><?php esc_html_e('Überprüfe die benutzerdefinierten Beitragstypen, die in "Archiven" angezeigt werden sollen.', $this->text_domain); ?></span>
+					<span class="description"><?php esc_html_e('Kategorie-, Schlagwort- und Taxonomiearchive enthalten automatisch alle öffentlichen Beitragstypen, die die jeweilige Taxonomie verwenden.', $this->text_domain); ?></span>
 					<br /><br />
 					<input type="checkbox" name="cp_post_type[archive][]" value="default" <?php checked(empty($cp_post_type['archive']['post_type']) || (is_array($cp_post_type['archive']['post_type']) && in_array('default', $cp_post_type['archive']['post_type']))); ?> />
 					<span class="description"><strong>default</strong></span><br />
@@ -243,28 +243,10 @@ $cp_post_type = empty($options['display_post_types']) ?
 					$date_format = $this->get_options('date_format');
 					$date_format = (is_array($date_format)) ? 'mm/dd/yy' : $date_format;
 
-					$datepicker_theme = $this->get_options('datepicker_theme');
-					$datepicker_theme = (is_array($datepicker_theme)) ? 'flick' : $datepicker_theme;
-
-					//					$this->jquery_ui_css($datepicker_theme); //Load the current ui theme css
-
-					$themes = glob($this->plugin_dir . 'datepicker/css/*', GLOB_ONLYDIR);
 					?>
-					<select id="datepicker_theme" name="datepicker_theme" style="width:230px" onchange="jQuery('#custom_date_format').val(''); jQuery('#jquery-ui-datepicker-css').prop('href', '<?php echo $this->plugin_url . 'datepicker/css/'; ?>' + this.options[this.selectedIndex].value + '/datepicker.css'); " >
-						<?php
-						foreach($themes as $theme){
-							$theme = basename($theme);
-							$selected = ($theme == $datepicker_theme) ? 'selected="selected"' : '';
-							echo "<option value=\"$theme\" $selected >" . ucwords(str_replace('-',' ', $theme)) . "</option>\n";
-						}
-						?>
-					</select><br />
-					<span class="description"><?php esc_html_e('Wähle Datumsauswahl Design.', $this->text_domain) ?></span>
-					<br /><br />
-					<div class="pickdate"></div>
 				</td>
 				<td style="vertical-align:top;">
-					<input type="text" id="date_format" name="date_format" size="38" value="<?php echo esc_attr( $date_format ); ?>" onchange="jQuery('.pickdate').datepicker( 'option', 'dateFormat', this.value );"/><br />
+					<input type="text" id="date_format" name="date_format" size="38" value="<?php echo esc_attr( $date_format ); ?>" onchange="if(window.flatpickrInstance){flatpickrInstance.set('dateFormat', ctDateFormatToFlatpickr(this.value));}"/><br />
 					<span class="description"><?php esc_html_e('Wähle die Option Datumsformat oder gib Deine eigene ein', $this->text_domain) ?></span>
 					<br /><br />
 					<input class="pickdate" id="datepicker" type="text" size="38" value="" /><br />
@@ -309,15 +291,10 @@ $cp_post_type = empty($options['display_post_types']) ?
 	</form>
 </div>
 
-<link rel="stylesheet" href="<?php echo $this->plugin_url; ?>assets/flatpickr/flatpickr.min.css">
-<script src="<?php echo $this->plugin_url; ?>assets/flatpickr/flatpickr.min.js"></script>
 <script type="text/javascript">
 document.addEventListener('DOMContentLoaded', function() {
-	flatpickr('.pickdate', {
-		dateFormat: '<?php echo esc_js($date_format); ?>',
-		defaultDate: new Date(),
-		allowInput: true
+	window.flatpickrInstance = ctCreateDatePicker('#datepicker', '<?php echo esc_js($date_format); ?>', {
+		defaultDate: new Date()
 	});
 });
 </script>
-

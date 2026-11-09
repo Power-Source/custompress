@@ -675,8 +675,6 @@ if ( ! class_exists( 'CustomPress_Content_Types' ) ):
 							break;
 						}
 						case 'datepicker': {
-							// Flatpickr-Styles werden global eingebunden, daher kein Enqueue mehr nötig.
-
 							$result = '';
 
 							if ( ! empty( $custom_field['field_return_format'] ) ) {
@@ -694,10 +692,8 @@ if ( ! class_exists( 'CustomPress_Content_Types' ) ):
 							$result .= sprintf('
 							<script type="text/javascript">
 							document.addEventListener("DOMContentLoaded", function() {
-							flatpickr("#%s", {
-								dateFormat: "%s",
+							ctCreateDatePicker("#%s", "%s", {
 								defaultDate: "%s",
-								allowInput: true,
 								onChange: function(selectedDates, dateStr, instance) {
 								var dbField = document.getElementById("%s-db");
 								if(dbField && selectedDates.length) {

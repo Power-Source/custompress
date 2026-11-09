@@ -181,9 +181,8 @@ class CustomPress_Core_Admin extends CustomPress_Content_Types {
 		wp_enqueue_script('jquery-combobox');
 		wp_enqueue_style('jquery-combobox');
 		wp_enqueue_script('jquery-validate');
-		wp_enqueue_style('jquery-ui-datepicker');
-		wp_enqueue_script('jquery-ui-datepicker');
-		wp_enqueue_script('jquery-ui-datepicker-lang');
+		wp_enqueue_style('custompress-flatpickr');
+		wp_enqueue_script('custompress-datepicker');
 	}
 
 	/**
@@ -196,8 +195,8 @@ class CustomPress_Core_Admin extends CustomPress_Content_Types {
 		wp_enqueue_script('jquery-combobox');
 		wp_enqueue_style('jquery-combobox');
 		wp_enqueue_script('jquery-validate');
-		wp_enqueue_script('jquery-ui-datepicker');
-		wp_enqueue_script('jquery-ui-datepicker-lang');
+		wp_enqueue_style('custompress-flatpickr');
+		wp_enqueue_script('custompress-datepicker');
 	}
 
 	/**
@@ -210,8 +209,8 @@ class CustomPress_Core_Admin extends CustomPress_Content_Types {
 		wp_enqueue_script('jquery-combobox');
 		wp_enqueue_style('jquery-combobox');
 		wp_enqueue_script('jquery-validate');
-		wp_enqueue_script('jquery-ui-datepicker');
-		wp_enqueue_script('jquery-ui-datepicker-lang');
+		wp_enqueue_style('custompress-flatpickr');
+		wp_enqueue_script('custompress-datepicker');
 	}
 
 	/**

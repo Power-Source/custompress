@@ -26,7 +26,7 @@ if ( ! class_exists( 'CustomPress_Core' ) ):
 		function __construct() {
 			add_action( 'plugins_loaded', array( &$this, 'on_plugins_loaded' ), 0 );
 
-			add_filter( 'pre_get_posts', array( &$this, 'display_custom_post_types' ) );
+			add_action( 'pre_get_posts', array( $this, 'display_custom_post_types' ) );
 			add_action( 'wp_ajax_cp_get_post_types', array( &$this, 'ajax_action_callback' ) );
 
 			add_action( 'wp_enqueue_scripts', array( $this, 'on_enqueue_scripts' ) );
@@ -263,38 +263,9 @@ if ( ! class_exists( 'CustomPress_Core' ) ):
         }
 
 		function on_enqueue_scripts() {
-			// People use both "_" and "-" versions for locale IDs en_GB en-GB
-			//Translate it all to dashes because that's the way the standard translation files for datepicker are named.
-			$wplang = str_replace( '_', '-', get_locale() );
-			$lang   = ( $wplang == '' ) ? '' : substr( $wplang, 0, 2 ); // Non specific locale
-
-			// Specific locale exceptions
-			$lang = ( in_array( $wplang, array(
-				'ar-DZ',
-				'cy-GB',
-				'en-AU',
-				'en-GB',
-				'en-NZ',
-				'fr-CH',
-				'nl-BE',
-				'pt-BR',
-				'sr-SR',
-				'zh-CN',
-				'zh-HK',
-				'zh-TW'
-			) ) ) ? $wplang : $lang;
-
-			if ( ! empty( $lang ) ) {
-				// If it can't find one too bad.
-				wp_register_script( 'jquery-ui-datepicker-lang', $this->plugin_url . "datepicker/js/i18n/jquery.ui.datepicker-$lang.js", array(
-					'jquery',
-					'jquery-ui-datepicker'
-				), '1.8.18' );
-			}
-
-			// Dynamic CSS switching for date picker
-			wp_register_script( 'dynamic-css', $this->plugin_url . "datepicker/js/cp-dynamic-css.js", array(), 'CP-' . CPT_VERSION );
-			//wp_enqueue_script('dynamic-css');
+			wp_register_script( 'custompress-flatpickr', $this->plugin_url . 'assets/flatpickr/flatpickr.min.js', array(), '4.6.13', true );
+			wp_register_script( 'custompress-datepicker', $this->plugin_url . 'assets/flatpickr/custompress-flatpickr.js', array( 'custompress-flatpickr' ), CPT_VERSION, true );
+			wp_register_style( 'custompress-flatpickr', $this->plugin_url . 'assets/flatpickr/flatpickr.min.css', array(), '4.6.13' );
 
 			wp_register_script( 'jquery-validate', $this->plugin_url . "ui-admin/js/jquery.validate.js", array( 'jquery' ), '1.8.18' );
 
@@ -302,17 +273,6 @@ if ( ! class_exists( 'CustomPress_Core' ) ):
 
 			wp_register_style( 'jquery-combobox', $this->plugin_url . "datepicker/js/jquery.combobox/style.css", array(), '0.5' );
 
-			$theme = $this->get_options( 'datepicker_theme' );
-			if ( empty( $theme ) ) {
-				$theme = 'flick';
-			} elseif ( is_array( $theme ) ) {
-				$theme = array_filter( $theme );
-				$theme = array_shift( $theme );
-			}
-			// Verify it is a string value.
-			$theme = ( empty( $theme ) || ! is_string( $theme ) ) ? 'flick' : $theme;
-
-			wp_register_style( 'jquery-ui-datepicker', $this->plugin_url . "datepicker/css/{$theme}/datepicker.css", array(), '0.5' );
 		}
 
 		/**
@@ -379,17 +339,24 @@ if ( ! class_exists( 'CustomPress_Core' ) ):
 		}
 
 		/**
-		 * Display custom post types on home page.
+		 * Display selected custom post types in general content listings.
 		 *
 		 * @param object $query
 		 *
 		 * @return object $query
 		 */
 		function display_custom_post_types( $query ) {
-			global $wp_query;
-			//if ( is_main_site() || get_site_option('allow_per_site_content_types') )
+			if ( is_admin() || ! $query->is_main_query() ) {
+				return $query;
+			}
 
-			if ( is_admin() ) {
+			if ( $query->is_category() || $query->is_tag() || $query->is_tax() ) {
+				$this->add_taxonomy_post_types( $query );
+
+				return $query;
+			}
+
+			if ( $query->is_post_type_archive() ) {
 				return $query;
 			}
 
@@ -398,47 +365,80 @@ if ( ! class_exists( 'CustomPress_Core' ) ):
 			//Home Page
 			if ( isset( $options['display_post_types']['home']['post_type'] ) && is_array( $options['display_post_types']['home']['post_type'] ) ) {
 				$post_types = $options['display_post_types']['home']['post_type'];
-				if ( is_home() && ! in_array( 'default', $post_types ) ) {
+				if ( $query->is_home() && ! in_array( 'default', $post_types, true ) ) {
 					if ( count( $post_types ) == 1 ) {
 						$post_types = $post_types[0];
 					}
-					$wp_query->query_vars['post_type'] = $post_types;
+					$query->set( 'post_type', $post_types );
 				}
 			}
 
-			//Archive Page
+			//Date and author archive pages
 			if ( isset( $options['display_post_types']['archive']['post_type'] ) && is_array( $options['display_post_types']['archive']['post_type'] ) ) {
 				$post_types = $options['display_post_types']['archive']['post_type'];
-				if ( is_archive() && ! in_array( 'default', $post_types ) ) {
+				if ( ( $query->is_date() || $query->is_author() ) && ! in_array( 'default', $post_types, true ) ) {
 					if ( count( $post_types ) == 1 ) {
 						$post_types = $post_types[0];
 					}
-					$wp_query->query_vars['post_type'] = $post_types;
+					$query->set( 'post_type', $post_types );
 				}
 			}
 
 			//Front Page
 			if ( isset( $options['display_post_types']['front_page']['post_type'] ) && is_array( $options['display_post_types']['front_page']['post_type'] ) ) {
 				$post_types = $options['display_post_types']['front_page']['post_type'];
-				if ( is_front_page() && ! in_array( 'default', $post_types ) ) {
+				if ( $query->is_front_page() && ! in_array( 'default', $post_types, true ) ) {
 					if ( count( $post_types ) == 1 ) {
 						$post_types = $post_types[0];
 					}
-					$wp_query->query_vars['post_type'] = $post_types;
+					$query->set( 'post_type', $post_types );
 				}
 			}
 
 			//Search Page
 			if ( isset( $options['display_post_types']['search']['post_type'] ) && is_array( $options['display_post_types']['search']['post_type'] ) ) {
 				$post_types = $options['display_post_types']['search']['post_type'];
-				if ( is_search() && ! in_array( 'default', $post_types ) ) {
+				if ( $query->is_search() && ! in_array( 'default', $post_types, true ) ) {
 					if ( count( $post_types ) == 1 ) {
 						$post_types = $post_types[0];
 					}
-					$wp_query->query_vars['post_type'] = $post_types;
+					$query->set( 'post_type', $post_types );
 				}
 			}
 
+			return $query;
+		}
+
+		/**
+		 * Include every public post type that is registered for the queried taxonomy.
+		 *
+		 * @param object $query
+		 *
+		 * @return void
+		 */
+		function add_taxonomy_post_types( $query ) {
+			if ( $query->is_category() ) {
+				$taxonomy = 'category';
+			} elseif ( $query->is_tag() ) {
+				$taxonomy = 'post_tag';
+			} else {
+				$taxonomy = $query->get( 'taxonomy' );
+			}
+
+			if ( empty( $taxonomy ) ) {
+				return;
+			}
+
+			$post_types = array();
+			foreach ( get_post_types( array( 'public' => true ), 'names' ) as $post_type ) {
+				if ( in_array( $taxonomy, get_object_taxonomies( $post_type ), true ) ) {
+					$post_types[] = $post_type;
+				}
+			}
+
+			if ( ! empty( $post_types ) ) {
+				$query->set( 'post_type', $post_types );
+			}
 		}
 
 		/**
@@ -579,20 +579,6 @@ if ( ! class_exists( 'CustomPress_Core' ) ):
 			} else {
 				echo "<p>Rendern der Admin-Vorlage {$this->plugin_dir}ui-admin/{$name}.php fehlschlagen</p>";
 			}
-		}
-
-		/**
-		 * get_jquery_ui_css -  Returns a piece of javascript that will load or switch the jQuery-ui css Stylesheet to the current theme. This is used so the theme won't be loaded unless ther is a ui conpnent on the page.
-		 *
-		 */
-		function jquery_ui_css( $theme = '' ) {
-			$theme = ( empty( $theme ) ) ? $this->get_options( 'datepicker_theme' ) : $theme;
-			$theme = ( empty( $theme ) ) ? 'flick' : $theme;
-			?>
-			<script>jQuery(document).ready(function () {
-					jQuery("#jquery-ui-datepicker-css").prop("href", "<?php echo $this->plugin_url . "datepicker/css/{$theme}/datepicker.css"; ?>");
-				});</script>
-		<?php
 		}
 
 		/**
