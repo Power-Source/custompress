@@ -13,6 +13,9 @@ Beitragstypen, Taxonomien und benutzerdefinierte Felder. Damit lassen sich
 Inhalte wie Produkte, Immobilien, Rezensionen oder Veranstaltungen getrennt
 von normalen Blogbeitraegen strukturieren und pflegen.
 
+Die ausführliche deutschsprachige Anleitung mit Screenshots steht unter
+[docs/README.md](docs/README.md) bereit.
+
 ## Funktionen
 
 - Eigene Beitragstypen mit frei konfigurierbaren Labels und Eigenschaften
